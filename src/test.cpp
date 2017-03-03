@@ -5,18 +5,16 @@
 #include "gamecircle.h"
 #include <math.h>
 #define player1posx 20
-#define player2posx 760
+#define player2posx 560
 #define radius 20
 #include "gamePowerup.h"
 #define rect_width 30
-#define windowlength 800
+#define windowlength 600
 #define windowheight 600
 #include <sstream>
 #include "gamestart.h"
-#define max_Score 10
+#define max_Score 5
 #include "gameend.h"
-#include <stdlib.h>
-#include <time.h>
 #include <SFML/Audio.hpp>
 
 
@@ -50,10 +48,10 @@ std::string player1_Name = "Madara uchiha", player2_Name = "Hashirama Senju";
 
 gameCircle cBall(100,100,20);
 gameCircle fake_ball;
-pingRectangle barrier;
 sf::CircleShape circle = cBall.getCircle();
 pingRectangle player1(player1posx,150, rect_width,rectLength);
 pingRectangle player2(player2posx,150, rect_width,rectLength);
+pingRectangle barrier( 1,2,3,4);
 Obstacle Powerup1(1);
 Obstacle Powerup2(2);
 Powerup power_invis;
@@ -75,12 +73,7 @@ std::string convert(int a)
 
 int main()
 {
-    //srand(time(NULL));
-    sf::RenderWindow win(sf::VideoMode(windowlength, windowheight), "SFML Test");
-    win.setActive(false);
-    gameStart s("Ping Pong Game","New Game","Set PlayerName",&win);
-    if(s.getPLayer1() != "")player1_Name = s.getPLayer1();
-    if(s.getPLayer2() != "")player2_Name = s.getPLayer2();
+    sf::RenderWindow win(sf::VideoMode(600, 600), "SFML Test");
     sf::Thread t(&display);
     sf::Thread pad1(&controlpad1);
     sf::Thread pad2(&controlpad2);
@@ -120,40 +113,65 @@ int main()
                 player2down = true;
         }
 
-        if(score_left == max_Score || score_right == max_Score)
-            _end = true;
-
         win.clear();
 		if (!_end)draw_shape(win);
-		else
-        {
-            music.stop();
-            gameend e(score_left, score_right, player1_Name, player2_Name, &win);
-        }
+		else gameend e(score_left, score_right, player1_Name, player2_Name, &win);
 		win.display();
     }
     return 0;
 }
 
-
 /*************************END MAIN *******************/
-
-void powerthread()
+void illusion_effect()
 {
-	int s = 0, k = 0,l=0;
-	int illusion_time = 0;
-	int restriction_time = 0 ;
-	for (int i = 0; true; i++)
+	for (int i = 0; i < 11; i++)
 	{
-	/*	if (s > 0)
+		if (i == 5)
 		{
-			s--;
-			if (s == 0) power_invis.end_duration();
+			illusion.setpowerup();
 		}
-		if (l > 0)
+		else if (illusion.is_powerup_on() && i == 10)
 		{
-			l--;
-			if (l == 0)
+			illusion.setpowerupfree();
+		}
+		Sleep(1000);
+	}
+}
+void invis_effect()
+{
+	int duration = 0;
+	for (int i = 0; i <16 ; i++)
+	{
+		if (duration > 0)
+		{
+			duration--;
+			if (duration == 0) power_invis.end_duration();
+		}
+		if (i ==0)
+		{
+			power_invis.setpowerup();
+		}
+		else if (power_invis.is_powerup_on() && i  == 10)
+		{
+			power_invis.setpowerupfree();
+			break;
+		}
+		if ((power_invis.is_p1_affected() || power_invis.is_p2_affected()) && duration == 0)
+		{
+			duration = 5;
+		}
+		Sleep(1000);
+	}
+}
+void diminish_effect()
+{
+	int duration=0;
+	for (int i = 0; i <21 ; i++)
+	{
+		if (duration > 0)
+		{
+			duration--;
+			if (duration == 0)
 			{
 				if (power_diminish.is_p1_affected()) player1.scale(1.0, 2.0);
 				else player2.scale(1.0, 2.0);
@@ -161,87 +179,99 @@ void powerthread()
 
 			}
 		}
-		if (k > 0)
+		if (i == 0)
 		{
-			k--;
-			if(countdown) countdown--;
-			if (k == 10)
+			power_diminish.setpowerup();
+		}
+		else if (power_diminish.is_powerup_on() && i == 10)
+		{
+			power_diminish.setpowerupfree();
+			break;
+		}
+		if ((power_diminish.is_p1_affected() || power_diminish.is_p2_affected()) && duration == 0)
+		{
+			duration = 10;
+		}
+		Sleep(1000);
+	}
+}
+void speed_effect()
+{
+	int duration=0;
+	for (int i = 0; i < 16; i++)
+	{
+		if (duration > 0)
+		{
+			duration--;
+			if (countdown) countdown--;
+			if (duration == 10)
 			{
 				speed_brag = false;
 				velocity = 4;
 			}
-			if (k == 0) velocity = 2;
+			if (duration == 0) velocity = 2;
 		}
-		*/
-
-		if ( restriction_time > 0)
-        {
-            restriction_time -- ;
-            if (restriction_time == 0)
-                restriction.end_duration();
-
-        }
-
-		if (i % 60 == 0)
-		{
-			Powerup1.setObstacle();
-		}
-		if (i % 60 == 3)
-		{
-			Powerup1.setobstaclefree();
-		}
-		if (i % 60 == 1)
-		{
-			Powerup2.setObstacle();
-		}
-		if (i % 60 == 4)
-		{
-			Powerup2.setobstaclefree();
-		}
-
-		if ( (restriction.is_p1_affected() || restriction.is_p2_affected() ) && restriction_time == 0 )
-            restriction_time = 15;
-
-		/*
-		if (i % 60 == 41)
-		{
-			power_invis.setpowerup();
-		}
-		else if (power_invis.is_powerup_on() && i % 60 == 50)
-		{
-			power_invis.setpowerupfree();
-		}
-		if((power_invis.is_p1_affected() ||power_invis.is_p2_affected()) && s==0)
-		{
-			s = 5;
-		}
-		if (i % 60 == 21)
+		if (i ==0)
 		{
 			speed_brag = true;
-			k = 15;
+			duration = 15;
 			countdown = 5;
 		}
-		if (i % 60 == 30)
+		Sleep(1000);
+	}
+}
+void obstacle_effect()
+{
+	for (int i = 0; i < 5; i++)
+	{
+		if (i == 0)
+			Powerup1.setObstacle();
+		if (i == 3)
+			Powerup1.setobstaclefree();
+		if (i == 1)
+			Powerup2.setObstacle();
+		if (i == 4)
+			Powerup2.setobstaclefree();
+		Sleep(1000);
+	}
+}
+void restrict_effect()
+{
+	int duration = 0;
+	for (int i = 0; i < 21; i++)
+	{
+		if (duration > 0)
 		{
-			power_diminish.setpowerup();
+			duration--;
+			if (duration == 0)
+				restriction.end_duration();
+
 		}
-		else if (power_diminish.is_powerup_on() && i % 60 == 40)
-		{
-			power_diminish.setpowerupfree();
-		}
-		if ((power_diminish.is_p1_affected() || power_diminish.is_p2_affected()) && l == 0)
-		{
-			l = 10;
-		}
-		*/
-		if (i % 60 == 5)
+		if (i ==0)
 		{
 			restriction.setpowerup();
 		}
-		else if (restriction.is_powerup_on() && i % 60 == 55)
+		else if (restriction.is_powerup_on() && i  == 10)
 		{
 			restriction.setpowerupfree();
+			break;
 		}
+		if ((restriction.is_p1_affected() || restriction.is_p2_affected()) && duration == 0)
+			duration = 10;
+		Sleep(1000);
+	}
+}
+void powerthread()
+{
+	for (; true;)
+	{
+		int choice = rand() % 10;
+		if (choice == 0) illusion_effect();
+		else if (choice == 1) invis_effect();
+		else if (choice == 2) speed_effect();
+		else if (choice == 3) diminish_effect();
+		else if (choice == 4) restrict_effect();
+		else if (choice == 5) obstacle_effect();		
 		Sleep(1000);
 	}
 }
@@ -255,8 +285,9 @@ void  draw_shape(sf::RenderWindow& window)
     window.draw(cBall.getCircle());
 	if (Powerup2._gameObstacle()) window.draw(Powerup2.getObstacle());
 	if (illusion.is_powerup_on()) window.draw(illusion.getpowerup().getCircle());
-	if (illusion.is_effect_on())
-		window.draw(fake_ball.getCircle());
+	if (illusion.is_effect_on()) window.draw(fake_ball.getCircle());
+	if (restriction.is_powerup_on()) window.draw(restriction.getpowerup().getCircle());
+	if (restriction.is_effect_on())	window.draw(barrier.getShape());
 	if(speed_brag)
 	{
 		countdownText.setFont(font);
@@ -266,10 +297,6 @@ void  draw_shape(sf::RenderWindow& window)
 		countdownText.setPosition(200, 100);
 		window.draw(countdownText);
 	}
-    if (restriction.is_powerup_on()) window.draw(restriction.getpowerup().getCircle());
-
-	if (restriction.is_effect_on() || restriction.is_p2_affected() || restriction.is_p1_affected())
-        window.draw(barrier.getShape());
 }
 
 void display()
@@ -283,73 +310,64 @@ void display()
 		sf::sleep(sf::milliseconds(8));
     }
 }
-
 void controlpad1()
 {
-    while(1)
-    {
-        if( up)
-        {
-            if(restriction.is_p1_affected() && player1.getposy() <= barrier.getposy() + 2){}
+	while (1)
+	{
+		if (up)
+		{
+			if (restriction.is_p1_affected() && player1.getposy() <= barrier.getposy() + 2) {}
+			else
+				player1.movePad(0, -5);
+			up = false;
+		}
+		if (down)
+		{
+			player1.movePad(0, 5);
+			down = false;
+		}
 
-            else
-               player1.movePad(0,-5);
-            up = false;
-        }
-
-        if (down)
-        {
-             player1.movePad(0,5);
-             down = false;
-        }
-
-    }
+	}
 }
 
 void controlpad2()
 {
-    while(1)
-    {
-        if(player2up)
-        {
-
-            if(restriction.is_p2_affected() && player2.getposy() <= barrier.getposy() + 2){}
-            else
-                player2.movePad(0,-5);
-            player2up = false;
-        }
-
-        if (player2down)
-        {
-             player2.movePad(0,5);
-             player2down = false;
-        }
-    }
+	while (1)
+	{
+		if (player2up)
+		{
+			if (restriction.is_p2_affected() && player2.getposy() <= barrier.getposy() + 2) {}
+			else
+				player2.movePad(0, -5);
+			player2up = false;
+		}
+		if (player2down)
+		{
+			player2.movePad(0, 5);
+			player2down = false;
+		}
+	}
 }
 
 int _getDirection()
 {
-
-    if (restriction.is_powerup_on() && cBall.getCircle().getGlobalBounds().intersects(restriction.getpowerup().getCircle().getGlobalBounds()) )
+	if (restriction.is_powerup_on() && cBall.getCircle().getGlobalBounds().intersects(restriction.getpowerup().getCircle().getGlobalBounds()))
 	{
 		std::cout << "restriction on\n";
 		restriction.setpowerupfree();
-		if(ball_controller)
-        {
-            restriction.take_effect(2);
-            float y = player1.getposy() - rand()%((int)player1.getShape().getPosition().y - 10) + 10;
-            barrier = pingRectangle(windowlength - 40,y,40,2);
-        }
+		if (ball_controller)
+		{
+			restriction.take_effect(2);
+			float y = player1.getposy() - rand() % ((int)player1.getShape().getPosition().y - 10) + 10;
+			barrier = pingRectangle(windowlength - 40, y, 40, 2);
+		}
 		else
-        {
-            restriction.take_effect(1);
-            float y = player2.getposy() - rand()%((int)player2.getShape().getPosition().y - 10) + 10;
-            barrier = pingRectangle(0,y,40,2);
-
-        }
-
+		{
+			restriction.take_effect(1);
+			float y = player2.getposy() - rand() % ((int)player2.getShape().getPosition().y - 10) + 10;
+			barrier = pingRectangle(0, y, 40, 2);
+		}
 	}
-
 	if (illusion.is_powerup_on() && cBall.getCircle().getGlobalBounds().intersects(illusion.getpowerup().getCircle().getGlobalBounds()) )
 	{
 		std::cout << "illusion on\n0";
@@ -479,13 +497,7 @@ int _getDirection()
 
 	else if (cBall.getcenterx() <= player1posx + (rect_width * 0.7) || cBall.getcenterx() >= player2posx - (rect_width * 0.3))
 	{
-	    if(cBall.getcenterx() <= player1posx + (rect_width * 0.7))
-            score_right ++;
-        else
-            score_left ++;
-
-		cBall.reset();
-		Sleep(2000);
+		cBall.reset(); 
 		direction = rand() % 40 + 10;
 		ball_controller = true;
 		int i = rand() % 4;
