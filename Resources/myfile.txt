@@ -1,0 +1,19 @@
+  		      		Instruction Page:
+
+
+control left pad with "w" & "s"
+control right pad with Up & Down key
+
+Powerups:
+
+lightning ball : Get your systems ready coz this ball just got energized!!
+
+small pad: Hurry up ...Your opponent has got a smaller pad than yours
+
+invisible pad: Be Prepared hoss!!you can't see your pad anymore :(
+
+Magnet: Don't move!! Ball's coming to you anyway :o
+
+restriction: Ouch!!You can now only move in a confined area.. ATB
+
+Press ESC to close this page 
