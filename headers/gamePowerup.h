@@ -7,7 +7,7 @@
 class Powerup
 {
 public:
-	Powerup();
+	Powerup(char img[]);
 	void setpowerup();
 	void setpowerupfree();
 	bool is_powerup_on();
@@ -16,12 +16,14 @@ public:
 	bool is_p1_affected();
 	bool is_p2_affected();
 	bool is_effect_on();
-	gameCircle getpowerup();
+	sf::CircleShape getsprite();
 protected:
 	bool disp;
 	bool paddle1;
 	bool paddle2;
-	gameCircle powerup;
+	sf::Texture texture;
+	sf::Sprite sprite;
+	sf::CircleShape shape;
 };
 class Obstacle
 {
@@ -39,4 +41,3 @@ private:
 };
 
 #endif // GAMEPOWERUP_H
-
