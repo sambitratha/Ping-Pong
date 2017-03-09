@@ -4,7 +4,6 @@
 
 void Obstacle::setPowerup()
 {
-    int x = rand()%6;
     _isObstacle = true;
 }
 
@@ -31,7 +30,7 @@ sf::RectangleShape Obstacle::setObstacle()
 	if (count == 1)
 	{
 		rect_x = rand() % 180 + 100;
-		rect_y = rand() % 550;
+		rect_y = rand() % 480 + 50;
 	}
 	else if (count == 2)
 	{
@@ -49,8 +48,13 @@ sf::RectangleShape Obstacle::getObstacle()
 {
     return obstacle;
 }
-Powerup::Powerup()
+Powerup::Powerup(char img[])
 {
+    shape = sf::CircleShape(10);
+	if (!texture.loadFromFile(img) ) // sf::IntRect(10, 10, 32, 32) - to cut out a rectangle out of the texture
+	{
+	}
+	shape.setTexture(&texture);
 	paddle1 = paddle2 = false;
 	disp = false;
 }
@@ -65,13 +69,13 @@ bool Powerup::is_p2_affected()
 void Powerup::setpowerup()
 {
 	float x = rand() % 360 + 100;
-	float y = rand() % 550;
-	powerup = gameCircle(x, y, 10);
+	float y = rand() % 480 + 50;
+	shape.setPosition(sf::Vector2f(x, y));
 	disp = true;
 }
-gameCircle Powerup::getpowerup()
+sf::CircleShape Powerup::getsprite()
 {
-	return powerup;
+	return shape;
 }
 void Powerup::setpowerupfree()
 {
